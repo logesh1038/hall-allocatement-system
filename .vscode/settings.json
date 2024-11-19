@@ -1,0 +1,23 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "mycon",
+            "database": "hall",
+            "username": "root",
+            "password": "1234"
+        }
+    ],
+    "java.compile.nullAnalysis.mode": "automatic",
+    "liveServer.settings.port": 5502,
+    "cSpell.words": [
+        "sresult"
+    ]
+}

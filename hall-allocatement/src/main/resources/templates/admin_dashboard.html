@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 20px;
+            color: #333;
+        }
+        h1 {
+            background: linear-gradient(45deg, #6a3093, #a044ff);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 2px #000;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .approve-button {
+            background-color: #4CAF50; /* Green */
+            color: white;
+        }
+        .reject-button {
+            background-color: #f44336; /* Red */
+            color: white;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <h1>Admin Dashboard - Hall Booking Requests</h1>
+    <table id="bookingTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Block</th>
+                <th>Room</th>
+                <th>Department</th>
+                <th>Employee ID</th>
+                <th>Check-in Date</th>
+                <th>Check-in Time</th>
+                <th>Check-out Date</th>
+                <th>Check-out Time</th>
+                <th>Seats</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Booking requests will be loaded here -->
+        </tbody>
+    </table>
+
+    <script>
+        const apiUrl = 'http://localhost:8080/admin/booking-requests';
+
+        window.onload = function() {
+            fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                const table = document.getElementById('bookingTable').getElementsByTagName('tbody')[0];
+                data.forEach(item => {
+                    let row = table.insertRow();
+                    row.insertCell(0).innerHTML = item.id;
+                    row.insertCell(1).innerHTML = item.block;
+                    row.insertCell(2).innerHTML = item.room;
+                    row.insertCell(3).innerHTML = item.department;
+                    row.insertCell(4).innerHTML = item.staffid; 
+                    row.insertCell(5).innerHTML = item.checkInDate;
+                    row.insertCell(6).innerHTML = item.checkInTime;
+                    row.insertCell(7).innerHTML = item.checkOutDate;
+                    row.insertCell(8).innerHTML = item.checkOutTime;
+                    row.insertCell(9).innerHTML = item.numberOfSeats;
+                    row.insertCell(10).innerHTML = item.status;
+                    let actionCell = row.insertCell(11);
+                    if (item.status === 'Pending') {
+                        actionCell.innerHTML = `<button onclick="updateapprove('${item.id}')">Approve</button>
+                                                <button onclick="updatereject('${item.id}')">Reject</button>`;
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading the booking requests:', error));
+        };
+
+        function updateapprove(staffId) {
+            fetch(`http://localhost:8080/admin/booking/${staffId}/approve`, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => Promise.reject(new Error(text)));
+                }
+                return response.text();
+            })
+            .then(message => {
+                alert(message);
+                location.reload();
+                // Reload the page or update the UI as needed
+            })
+            .catch(error => {
+                console.error('Error approving booking:', error);
+                alert(`Failed to approve booking: ${error.message}`);
+            });
+        }
+
+        function updatereject(staffId) {
+            fetch(`http://localhost:8080/admin/booking/${staffId}/reject`, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => Promise.reject(new Error(text)));
+                }
+                return response.text();
+            })
+            .then(message => {
+                alert(message);
+                location.reload();
+                // Reload the page or update the UI as needed
+            })
+            .catch(error => {
+                console.error('Error rejecting booking:', error);
+                alert(`Failed to reject booking: ${error.message}`);
+            });
+        }
+    </script>
+</body>
+</html>

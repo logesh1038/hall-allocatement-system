@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+</head>
+<body>
+    <h1>Your Booking Requests</h1>
+    <div id="bookingsContainer"></div>
+
+    <script>
+        const staffId = 123;  // This should be dynamically set based on the logged-in user
+        window.onload = function() {
+            fetch(`http://localhost:8080/api/bookings/by-staff/${staffId}`)
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('bookingsContainer');
+                data.forEach(booking => {
+                    const div = document.createElement('div');
+                    div.innerHTML = `ID: ${booking.id}, Status: ${booking.status}, Room: ${booking.room}, Date: ${booking.checkInDate}`;
+                    container.appendChild(div);
+                });
+            })
+            .catch(error => console.error('Failed to load your booking requests:', error));
+        };
+    </script>
+</body>
+</html>

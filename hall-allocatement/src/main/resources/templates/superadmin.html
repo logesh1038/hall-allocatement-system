@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Module</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Admin Module</h1>
+        </header>
+
+        <section class="create-admin">
+            <h2>Create New Admin</h2>
+            <form id="admin-form">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+
+                <button type="submit">Create Admin</button>
+            </form>
+        </section>
+
+        <section class="all-admins">
+            <h2>All Admins</h2>
+            <table id="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Password</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-list">
+                    <!-- Admins will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('admin-form');
+            const adminList = document.getElementById('admin-list');
+
+            // Function to fetch all admins and populate the table
+            function fetchAdmins() {
+                fetch('http://localhost:8080/admin/all')  // Ensure correct URL
+                    .then(response => response.json())
+                    .then(admins => {
+                        adminList.innerHTML = '';
+                        admins.forEach(admin => {
+                            addAdminToTable(admin);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching admins:', error));
+            }
+
+            // Function to add admin to table
+            function addAdminToTable(admin) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${admin.id}</td>
+                    <td>${admin.username}</td>
+                    <td>${admin.password}</td>
+                    <td><button class="delete-btn" data-id="${admin.id}">Delete</button></td>
+                `;
+                adminList.appendChild(row);
+            }
+
+            // Event listener for form submission
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                const admin = {
+                    username: username,
+                    password: password
+                };
+
+                fetch('http://localhost:8080/admin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(admin)
+                })
+                .then(response => response.json())
+                .then(createdAdmin => {
+                    addAdminToTable(createdAdmin);
+                    form.reset();
+                })
+                .catch(error => console.error('Error creating admin:', error));
+            });
+
+            // Event listener for delete buttons
+            adminList.addEventListener('click', function(event) {
+                if (event.target.classList.contains('delete-btn')) {
+                    const adminId = event.target.getAttribute('data-id');
+                    fetch(`http://localhost:8080/admin/${adminId}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // Remove the admin row from the table if deletion is successful
+                            event.target.parentElement.parentElement.remove();
+                        } else {
+                            console.error('Failed to delete admin');
+                        }
+                    })
+                    .catch(error => console.error('Error deleting admin:', error));
+                }
+            });
+
+            // Fetch all admins and populate the table on page load
+            fetchAdmins();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>BOOKING HALL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- LINEARICONS -->
+    <link rel="stylesheet" href="fonts/linearicons/style.css">
+    <!-- MATERIAL DESIGN ICONIC FONT -->
+    <link rel="stylesheet" href="fonts/material-design-iconic-font/css/material-design-iconic-font.min.css">
+    <!-- DATE-PICKER -->
+    <link rel="stylesheet" href="vendor/date-picker/css/datepicker.min.css">
+    <!-- STYLE CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="wrapper">
+    <div class="inner">
+        <form id="bookingForm">
+            <h3>Find a Hall</h3>
+            <div class="form-row">
+                <div class="form-wrapper">
+                    <label for="">SELECT BLOCK *</label>
+                    <select id="block" onchange="populateRooms()">
+                        <option value="ADMIN">ADMIN</option>
+                        <option value="OVERALL">OVERALL</option>
+                    </select>
+                </div>
+                <div class="form-wrapper">
+                    <label for="">SELECT AUDITORIUM*</label>
+                    <select id="room">
+                    </select>
+                </div>
+            </div>
+			<div class="form-row last">
+				<div class="form-wrapper">
+					<label for="">EMPLOYEE ID *</label>
+					<input type="text" class="form-control" placeholder="Employee ID" id="staffid">
+				</div>
+				<div class="form-wrapper">
+					<label for="">DEPARTMENT *</label>
+					<select id="department">
+						<option value="MCA">MCA</option>
+						<option value="MBA">MBA</option>
+						<option value="M.TECH">M.TECH</option>
+						<option value="ECE">ECE</option>
+						<option value="MECHTRANICS">MECHTRANICS</option>
+						<option value="DATA SCIENCE">DATA SCIENCE</option>
+					</select>
+				</div>
+			</div>
+			
+            <div class="form-row last">
+                <div class="form-wrapper">
+                    <label for="">CHECK-IN*</label>
+                    <span class="lnr lnr-calendar-full"></span>
+                    <input type="text" class="form-control datepicker-here" data-language='en' data-date-format="dd M yyyy" id="checkInDate">
+                </div>
+                <div class="form-wrapper">
+                    <label for="">CHECK-OUT *</label>
+                    <span class="lnr lnr-calendar-full"></span>
+                    <input type="text" class="form-control datepicker-here" data-language='en' data-date-format="dd M yyyy" id="checkOutDate">
+                </div>
+            </div>
+            <div class="form-row last">
+                <div class="form-wrapper">
+                    <label for="check-in-time">CHECK-IN TIME *</label>
+                    <input type="time" id="check-in-time" class="form-control" placeholder="HH:MM AM/PM" required />
+                </div>
+                <div class="form-wrapper">
+                    <label for="check-out-time">CHECK-OUT TIME*</label>
+                    <input type="time" id="check-out-time" class="form-control" placeholder="HH:MM AM/PM" required />
+                </div>
+            </div>
+            <div class="form-row last">
+                <div class="form-wrapper">
+                    <label for="">NO OF SEATS *</label>
+                    <input type="text" class="form-control" placeholder="Seats" id="numberOfSeats">
+                </div>
+            </div>
+            <div class="form-row last">
+                <div class="form-wrapper">
+            <button  type="button" onclick="validateForm()">
+                <span>Book Hall</span>
+            </button></div>
+            <div class="form-wrapper">
+            <button type="button" onclick="checkBookingStatus()">
+                <span>Check Booking Status</span>
+            </button></div></div>
+        </form>
+    </div>
+</div>
+<script src="js/jquery-3.3.1.min.js"></script>
+<!-- DATE-PICKER -->
+<script src="vendor/date-picker/js/datepicker.js"></script>
+<script src="vendor/date-picker/js/datepicker.en.js"></script>
+<script src="js/main.js"></script>
+<script>
+
+    function checkBookingStatus(){
+        window.location.href='booking-status.html';
+    }
+   function populateRooms() {
+    var block = document.getElementById("block").value;
+    var roomSelect = document.getElementById("room");
+    roomSelect.innerHTML = "";
+    if (block === "ADMIN") {
+        addOption(roomSelect, "CV RAMAN");
+        addOption(roomSelect, "VIVEKANATHAM");
+        addOption(roomSelect, "SARABAI KALAM THEATRE");
+    } else if (block === "OVERALL") {
+        addOption(roomSelect, "RAMALINGAM ADIGALAR");
+    }
+    function addOption(selectElement, optionText) {
+        var option = document.createElement("option");
+        option.text = optionText;
+        selectElement.add(option);
+    }
+}
+
+function validateForm() {
+    var block = document.getElementById("block").value;
+    var room = document.getElementById("room").value;
+    var department = document.getElementById("department").value;
+    var checkInDate = document.getElementById("checkInDate").value;
+    var checkOutDate = document.getElementById("checkOutDate").value;
+    var checkInTime = document.getElementById("check-in-time").value;
+    var checkOutTime = document.getElementById("check-out-time").value;
+    var numberOfSeats = document.getElementById("numberOfSeats").value;
+    var staffid = document.getElementById("staffid").value; // Get staffId value
+    
+    // Check if any field is empty
+    if (!block || !room || !department || !checkInDate || !checkOutDate || !checkInTime || !checkOutTime || !numberOfSeats || !staffid) {
+        alert("Please fill all the fields");
+        return;
+    }
+    
+    var data = {
+        block: block,
+        room: room,
+        department: department,
+        checkInDate: checkInDate,
+        checkOutDate: checkOutDate,
+        checkInTime: checkInTime,
+        checkOutTime: checkOutTime,
+        numberOfSeats: numberOfSeats,
+        staffid: staffid 
+    };
+    fetch("http://localhost:8080/register/book-hall", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.text())
+    .then(message => {
+        alert(message);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+</script>
+</body>
+</html>
